@@ -36,6 +36,7 @@ class Vcs(object):
         Args:
             path (str) - optional. The path to the repo working directory.
         """
+        self.path = None
         if path is None:
             self.path = self.get_working_directory()
         else:
