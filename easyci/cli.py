@@ -1,6 +1,9 @@
 import click
 
+from easyci.commands.test import test
 
-@click.command()
+@click.group()
 def cli():
-    click.echo('EasyCI root command')
+    pass
+
+cli.add_command(test)
