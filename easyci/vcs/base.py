@@ -1,3 +1,7 @@
+"""
+This module is inspired by the open-sourced project Changes:
+https://github.com/dropbox/changes
+"""
 from __future__ import absolute_import
 
 import os
@@ -5,7 +9,9 @@ import os.path
 
 from subprocess import Popen, PIPE
 
+
 class CommandError(Exception):
+
     def __init__(self, cmd, retcode, stdout, stderr):
         self.cmd = cmd
         self.retcode = retcode
@@ -21,6 +27,7 @@ class CommandError(Exception):
 
 
 class Vcs(object):
+
     def __init__(self, path=None):
         """Initialize a new Vcs object for a repository located at `path`.
         If `path` is `None`, then `get_working_directory` is used to identify

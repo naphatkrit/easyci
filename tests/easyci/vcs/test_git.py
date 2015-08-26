@@ -23,4 +23,5 @@ def git(repo_path):
 
 
 def test_get_working_directory(git, repo_path):
-    assert os.path.realpath(git.get_working_directory()) == os.path.realpath(repo_path)
+    path = git.get_working_directory()
+    assert os.path.realpath(path) == os.path.realpath(repo_path)

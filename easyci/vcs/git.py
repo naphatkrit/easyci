@@ -3,6 +3,7 @@ from easyci.vcs.base import Vcs
 
 class GitVcs(Vcs):
     binary_path = 'git'
+
     def get_working_directory(self):
         """Get the working directory for this repo.
 
