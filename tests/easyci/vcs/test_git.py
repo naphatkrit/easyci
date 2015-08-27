@@ -19,7 +19,8 @@ def repo_path():
 
 @pytest.fixture(scope='function')
 def git(repo_path):
-    assert not os.system('cd {path} && git init'.format(path=repo_path))
+    assert not os.system(
+        'cd {path} && git init && touch foo && git add foo && git commit -m "foo"'.format(path=repo_path))
     return GitVcs(path=repo_path)
 
 
@@ -63,3 +64,20 @@ def test_remove_ignored_files(git, repo_path):
     git.remove_ignored_files()
     assert not os.path.exists(os.path.join(repo_path, 'a'))
     assert not os.path.exists(os.path.join(repo_path, 'b'))
+
+
+def test_get_signature(git, repo_path):
+    assert not os.system('cd {} && touch a && git add a'.format(repo_path))
+    old_signature = git.get_signature()
+    assert not os.system('cd {} && touch b && git add b'.format(repo_path))
+    new_signature = git.get_signature()
+    assert old_signature != new_signature
+    assert not os.system('cd {} && rm -f b && git rm b'.format(repo_path))
+    assert git.get_signature() == old_signature
+
+
+def test_private_dir(git, repo_path):
+    private_dir = git.private_dir()
+    assert os.path.join(repo_path, '.git/eci') == private_dir
+    assert os.path.exists(private_dir)
+    assert os.path.isdir(private_dir)

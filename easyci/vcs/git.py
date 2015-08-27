@@ -7,6 +7,12 @@ from easyci.vcs.base import Vcs
 class GitVcs(Vcs):
     binary_path = 'git'
 
+    def __init__(self, path=None):
+        super(GitVcs, self).__init__(path)
+        private_dir = self.private_dir()
+        if not os.path.exists(private_dir):
+            os.makedirs(private_dir)
+
     def get_working_directory(self):
         """Get the working directory for this repo.
 
@@ -40,6 +46,25 @@ class GitVcs(Vcs):
         """
         self.run('clean', '-fd')  # remove untracked files
         self.run('checkout', self.path)  # revert changes to staged version
+
+    def private_dir(self):
+        """Get the private directory associated with this repo, but untracked
+        by the repo.
+
+        Returns:
+            str - path
+        """
+        return os.path.join(self.path, '.git/eci')
+
+    def get_signature(self):
+        """Get the signature of the current state of the repository
+
+        Returns:
+            str
+        """
+        sha = self.run('rev-parse', '--verify', 'HEAD').strip()
+        diff = self.run('diff', sha)
+        return sha + '\n' + diff
 
     def install_hook(self, hook_name, hook_content):
         """Install the repository hook for this repo.

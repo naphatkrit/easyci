@@ -110,6 +110,23 @@ class Vcs(object):
         """
         raise NotImplementedError
 
+    def private_dir():
+        """Get the private directory associated with this repo, but untracked
+        by the repo.
+
+        Returns:
+            str - path
+        """
+        raise NotImplementedError
+
+    def get_signature(self):
+        """Get the signature of the current state of the repository
+
+        Returns:
+            str
+        """
+        raise NotImplementedError
+
     @contextmanager
     def temp_copy(self):
         """Yields a new Vcs object that represents a temporary, disposable
