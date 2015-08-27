@@ -74,9 +74,6 @@ class Vcs(object):
     def get_working_directory(self):
         """Get the working directory for this repo.
 
-        This is available as a class method as it is usually needed to
-        initialize the VCS object itself.
-
         Args:
             cls (class object): The class
 
@@ -85,5 +82,14 @@ class Vcs(object):
 
         Raises:
             CommandError
+        """
+        raise NotImplementedError
+
+    def install_hook(self, hook_name, hook_content):
+        """Install the repository hook for this repo.
+
+        Args:
+            hook_name (str)
+            hook_content (str)
         """
         raise NotImplementedError

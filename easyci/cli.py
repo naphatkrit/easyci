@@ -1,5 +1,6 @@
 import click
 
+from easyci.commands.init import init
 from easyci.commands.test import test
 from easyci.user_config import (
     load_user_config, ConfigFormatError, ConfigNotFoundError
@@ -22,4 +23,5 @@ def cli(ctx):
     ctx.obj = dict()
     ctx.obj['config'] = config
 
+cli.add_command(init)
 cli.add_command(test)
