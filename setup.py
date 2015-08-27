@@ -13,7 +13,7 @@ install_requires = [
 
 setup(
     name='easyci',
-    version='0.2',
+    version='0.2.1',
     author='Naphat Sanguansin',
     author_email='naphat.krit@gmail.com',
     description='Local CI, for mortals.',
