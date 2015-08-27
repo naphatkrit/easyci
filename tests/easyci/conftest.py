@@ -11,4 +11,5 @@ def runner():
         assert not os.system('git init')
         with open('eci.yaml', 'w') as f:
             f.write('{}')
+        assert not os.system('git add eci.yaml && git commit -m "eci.yaml"')
         yield runner

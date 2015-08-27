@@ -28,6 +28,19 @@ class GitVcs(Vcs):
         cmd = [self.binary_path] + list(cmd)
         return super(GitVcs, self).run(*cmd, **kwargs)
 
+    def remove_ignored_files(self):
+        """Remove files ignored by the repository
+        """
+        self.run('clean', '-fdX')
+
+    def remove_unstaged_files(self):
+        """Remove all unstaged files. This does NOT remove ignored files.
+
+        TODO this may be specific to git?
+        """
+        self.run('clean', '-fd')  # remove untracked files
+        self.run('checkout', self.path)  # revert changes to staged version
+
     def install_hook(self, hook_name, hook_content):
         """Install the repository hook for this repo.
 

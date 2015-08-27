@@ -6,8 +6,12 @@ from __future__ import absolute_import
 
 import os
 import os.path
+import shutil
 
+from contextlib import contextmanager
 from subprocess import Popen, PIPE
+
+from easyci.utils import contextmanagers
 
 
 class CommandError(Exception):
@@ -93,3 +97,30 @@ class Vcs(object):
             hook_content (str)
         """
         raise NotImplementedError
+
+    def remove_ignored_files(self):
+        """Remove files ignored by the repository
+        """
+        raise NotImplementedError
+
+    def remove_unstaged_files(self):
+        """Remove all unstaged files. This does NOT remove ignored files.
+
+        TODO this may be specific to git?
+        """
+        raise NotImplementedError
+
+    @contextmanager
+    def temp_copy(self):
+        """Yields a new Vcs object that represents a temporary, disposable
+        copy of the current repository. The copy is deleted at the end
+        of the context.
+
+        Yields:
+            Vcs
+        """
+        with contextmanagers.temp_dir() as temp_dir:
+            temp_root_path = os.path.join(temp_dir, 'root')
+            shutil.copytree(self.path, temp_root_path)
+            copy = self.__class__(path=temp_root_path)
+            yield copy
