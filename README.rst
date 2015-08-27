@@ -44,4 +44,4 @@ This command is to be run inside the target repository. This installs the necess
 
 eci test
 ++++++++
-This command creates a copy of your project and remove any unstaged changes and ignored files before running tests. If tests pass, then it stores a hash representing the current state of your project in :code:`.git/eci/passed`.
+This command creates a copy of your project and remove any ignored files before running tests. If tests pass, then it stores a hash representing the current state of your project in :code:`.git/eci/passed`.
