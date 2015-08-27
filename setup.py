@@ -15,6 +15,7 @@ setup(
     name='easyci',
     version='0.2',
     author='Naphat Sanguansin',
+    author_email='naphat.krit@gmail.com',
     description='Local CI, for mortals.',
     packages=find_packages(),
     include_package_data=True,
