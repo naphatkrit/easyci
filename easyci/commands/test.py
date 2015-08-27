@@ -6,8 +6,9 @@ from easyci.vcs.git import GitVcs
 
 
 @click.command()
+@click.option('--staged-only', '-s', is_flag=True, default=False, help='Test against staged version of the repo.')
 @click.pass_context
-def test(ctx):
+def test(ctx, staged_only):
     git = GitVcs()
     evidence_path = os.path.join(git.private_dir(), 'passed')
     known_signatures = []
@@ -16,7 +17,8 @@ def test(ctx):
             known_signatures = f.read().split()
     with git.temp_copy() as copy:
         copy.remove_ignored_files()
-        copy.remove_unstaged_files()
+        if staged_only:
+            copy.remove_unstaged_files()
         new_signature = copy.get_signature()
         if new_signature in known_signatures:
             click.echo(click.style('OK', bg='green', fg='black') + 'Files not changed.')

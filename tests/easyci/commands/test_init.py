@@ -29,5 +29,5 @@ def test_init(fake_vcs, runner):
     assert result.exit_code == 0
     (args1, _), (args2, _) = fake_vcs.install_hook.call_args_list
     calls = set([args1, args2])
-    assert ('pre-push', '#!/bin/bash\neci test\n') in calls
-    assert ('pre-commit', '#!/bin/bash\neci test\n') in calls
+    assert ('pre-push', '#!/bin/bash\neci test --staged-only\n') in calls
+    assert ('pre-commit', '#!/bin/bash\neci test --staged-only\n') in calls
