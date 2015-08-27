@@ -12,11 +12,13 @@ class ConfigNotFoundError(Exception):
 
 _default_config = {
     "tests": [],
+    "history_limit": 100,
 }
 
 
 _config_types = {
     "tests": list,
+    "history_limit": int,
 }
 
 

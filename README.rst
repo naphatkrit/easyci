@@ -28,11 +28,12 @@ Config
 ------
 The config lives in a file at the root of the repository, :code:`eci.yaml`.
 
-============= ==================== ===========
-key           type                 Description
-============= ==================== ===========
-:code:`tests` :code:`List[string]` This is a list of commands to run tests.
-============= ==================== ===========
+========================= ==================== ===========
+key                       type                 Description
+========================= ==================== ===========
+:code:`tests`             :code:`List[string]` This is a list of commands to run tests.
+:code:`history_limit`     :code:`int`          The number of passing test runs to remember.
+========================= ==================== ===========
 
 Commands
 --------

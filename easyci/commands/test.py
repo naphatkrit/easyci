@@ -10,15 +10,15 @@ from easyci.vcs.git import GitVcs
 def test(ctx):
     git = GitVcs()
     evidence_path = os.path.join(git.private_dir(), 'passed')
-    old_signature = None
+    known_signatures = []
     if os.path.exists(evidence_path):
         with open(evidence_path, 'r') as f:
-            old_signature = f.read()
+            known_signatures = f.read().split()
     with git.temp_copy() as copy:
         copy.remove_ignored_files()
         copy.remove_unstaged_files()
         new_signature = copy.get_signature()
-        if old_signature == new_signature:
+        if new_signature in known_signatures:
             click.echo(click.style('OK', bg='green', fg='black') + 'Files not changed.')
             ctx.exit(0)
         with contextmanagers.chdir(copy.path):
@@ -34,6 +34,8 @@ def test(ctx):
     if not all_passed:
         ctx.exit(1)
     else:
+        known_signatures.append(new_signature)
+        string = '\n'.join(known_signatures[-ctx.obj['config']['history_limit']:])
         # update evidence file
         with open(evidence_path, 'w') as f:
-            f.write(new_signature)
+            f.write(string)
