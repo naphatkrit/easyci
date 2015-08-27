@@ -13,12 +13,15 @@ install_requires = [
 
 setup(
     name='easyci',
-    version='0.1',
+    version='0.2',
     author='Naphat Sanguansin',
+    description='Local CI, for mortals.',
     packages=find_packages(),
     include_package_data=True,
     install_requires=install_requires,
     extras_require={'tests': tests_require},
+    url='https://github.com/naphatkrit/easyci',
+    download_url='https://github.com/naphatkrit/easyci/tarball/0.2',
     tests_require=tests_require,
     entry_points='''
         [console_scripts]
