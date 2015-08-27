@@ -1,3 +1,4 @@
+import hashlib
 import os
 import stat
 
@@ -64,7 +65,10 @@ class GitVcs(Vcs):
         """
         sha = self.run('rev-parse', '--verify', 'HEAD').strip()
         diff = self.run('diff', sha)
-        return sha + '\n' + diff
+        h = hashlib.sha1()
+        h.update(sha)
+        h.update(diff)
+        return h.hexdigest()
 
     def install_hook(self, hook_name, hook_content):
         """Install the repository hook for this repo.
