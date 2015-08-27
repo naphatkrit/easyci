@@ -19,3 +19,12 @@ def test_test_simple_passed(runner):
     assert result.exit_code == 0
     assert 'Passed' in result.output
     assert 'Failed' not in result.output
+
+
+def test_run_twice(runner):
+    with mock.patch('easyci.cli.load_user_config') as mocked:
+        mocked.return_value = {'tests': ['true', 'true']}
+        result = runner.invoke(cli, ['test'])
+        assert result.exit_code == 0
+        result = runner.invoke(cli, ['test'])
+    assert 'OK' in result.output
