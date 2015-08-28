@@ -48,6 +48,18 @@ class GitVcs(Vcs):
         self.run('clean', '-fd')  # remove untracked files
         self.run('checkout', self.path)  # revert changes to staged version
 
+    def clear(self, target_commit):
+        """Resets the repository to the target commit, removing any staged,
+        unstaged, and untracked files.
+
+        Args:
+            target_commit (str): the commit ID
+        Raises:
+            CommandError - if the commit does not exist
+        """
+        self.run('reset', '--hard', target_commit)
+        self.run('clean', '-fd')
+
     def private_dir(self):
         """Get the private directory associated with this repo, but untracked
         by the repo.

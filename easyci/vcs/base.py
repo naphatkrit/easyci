@@ -110,6 +110,17 @@ class Vcs(object):
         """
         raise NotImplementedError
 
+    def clear(self, target_commit):
+        """Resets the repository to the target commit, removing any staged,
+        unstaged, and untracked files.
+
+        Args:
+            target_commit (str): the commit ID
+        Raises:
+            CommandError - if the commit does not exist
+        """
+        raise NotImplementedError
+
     def private_dir():
         """Get the private directory associated with this repo, but untracked
         by the repo.

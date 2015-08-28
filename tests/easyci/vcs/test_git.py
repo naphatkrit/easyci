@@ -4,7 +4,7 @@ import shutil
 import stat
 import tempfile
 
-
+from easyci.vcs.base import CommandError
 from easyci.vcs.git import GitVcs
 
 
@@ -70,6 +70,22 @@ def test_remove_ignored_files(git, repo_path):
     git.remove_ignored_files()
     assert not os.path.exists(os.path.join(repo_path, 'a'))
     assert not os.path.exists(os.path.join(repo_path, 'b'))
+
+
+def test_clear(git, repo_path):
+    old_head = git.run('rev-parse', '--verify', 'HEAD').strip()
+    assert not os.system(
+        'cd {} && touch a && git add a && git commit -m a'.format(repo_path))
+    assert not os.system('cd {} && touch b && git add b'.format(repo_path))
+    assert not os.system('cd {} && touch c'.format(repo_path))
+    git.clear(old_head)
+    assert old_head == git.run('rev-parse', '--verify', 'HEAD').strip()
+    assert not os.path.exists(os.path.join(repo_path, 'a'))
+    assert not os.path.exists(os.path.join(repo_path, 'b'))
+    assert not os.path.exists(os.path.join(repo_path, 'c'))
+
+    with pytest.raises(CommandError):
+        git.clear('doesnotexist')
 
 
 def test_get_signature(git, repo_path):
