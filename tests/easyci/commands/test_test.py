@@ -38,6 +38,37 @@ def test_run_twice(runner):
         result = runner.invoke(cli, ['test'])
         assert result.exit_code == 0
         result = runner.invoke(cli, ['test'])
+    assert result.exit_code == 0
+    assert 'OK' in result.output
+
+
+def test_staged_only(runner):
+    with mock.patch('easyci.cli.load_user_config') as mocked:
+        mocked.return_value = mocked.return_value = {
+            'tests': ['true', 'true'],
+            'history_limit': 1,
+        }
+        assert not os.system('touch a && git add a && echo a > a')
+        result = runner.invoke(cli, ['test', '--staged-only'])
+        assert result.exit_code == 0
+        assert not os.system('rm -f a && touch a')
+        result = runner.invoke(cli, ['test', '--staged-only'])
+    assert result.exit_code == 0
+    assert 'OK' in result.output
+
+
+def test_run_twice_new_file(runner):
+    with mock.patch('easyci.cli.load_user_config') as mocked:
+        mocked.return_value = mocked.return_value = {
+            'tests': ['true', 'true'],
+            'history_limit': 1,
+        }
+        assert not os.system('touch a')
+        result = runner.invoke(cli, ['test'])
+        assert result.exit_code == 0
+        assert not os.system('git add a')
+        result = runner.invoke(cli, ['test'])
+    assert result.exit_code == 0
     assert 'OK' in result.output
 
 

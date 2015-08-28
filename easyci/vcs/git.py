@@ -60,6 +60,11 @@ class GitVcs(Vcs):
     def get_signature(self, base_commit=None):
         """Get the signature of the current state of the repository
 
+        TODO right now `get_signature` is an effectful process in that
+        it adds all untracked file to staging. This is the only way to get
+        accruate diff on new files. This is ok because we only use it on a
+        disposable copy of the repo.
+
         Args:
             base_commit - the base commit ('HEAD', sha, etc.)
 
@@ -68,6 +73,7 @@ class GitVcs(Vcs):
         """
         if base_commit is None:
             base_commit = 'HEAD'
+        self.run('add', '-A', self.path)
         sha = self.run('rev-parse', '--verify', base_commit).strip()
         diff = self.run('diff', sha).strip()
         if len(diff) == 0:

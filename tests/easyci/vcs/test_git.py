@@ -75,9 +75,13 @@ def test_remove_ignored_files(git, repo_path):
 def test_get_signature(git, repo_path):
     git.get_signature()  # get signature works
 
-    # check that signature is unique to file structure
-    assert not os.system('cd {} && touch a && git add a'.format(repo_path))
+    # check that get signature works with untracked files
+    assert not os.system('cd {} && touch a'.format(repo_path))
     old_signature = git.get_signature()
+    assert not os.system('cd {} && git add a'.format(repo_path))
+    assert old_signature == git.get_signature()
+
+    # check that we get a different signature by adding a new file
     assert not os.system('cd {} && touch b && git add b'.format(repo_path))
     new_signature = git.get_signature()
     assert old_signature != new_signature
