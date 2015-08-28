@@ -1,9 +1,10 @@
 EasyCI
 ======
+*CI for mortals*
 
 **Note**: EasyCI only works with git repositories.
 
-CI for mortals. Never worry about checking in broken code again. No need to maintain a CI server. No need to shell out ridiculous amount of money for your personal project. EasyCI puts your mind at ease, like a good CI service, but without all the extra costs.
+Never worry about checking in broken code again. No need to maintain a CI server. No need to shell out ridiculous amount of money for your personal project. EasyCI puts your mind at ease, like a good CI service, but without all the extra costs.
 
 EasyCI operates via git :code:`pre-commit` and :code:`pre-push` hooks to ensure that your code passes tests before letting you commit/push.
 
