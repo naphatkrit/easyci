@@ -8,3 +8,6 @@ install-test-requirements: install-requirements
 
 deploy:
 	python setup.py register -r pypi && python setup.py sdist upload -r pypi
+
+deploy-test:
+	python setup.py register -r pypitest && python setup.py sdist upload -r pypitest
