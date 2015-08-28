@@ -19,5 +19,3 @@ def init():
         with open(config_path, 'w') as f:
             f.write(yaml.safe_dump(
                 {'tests': ['echo please modify to run your tests', 'true']}))
-    else:
-        click.echo("Config file `eci.yaml` already exists.")
