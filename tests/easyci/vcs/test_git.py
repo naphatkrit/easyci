@@ -17,10 +17,16 @@ def repo_path():
         shutil.rmtree(path)
 
 
-@pytest.fixture(scope='function')
-def git(repo_path):
+@pytest.fixture(scope='function', params=[
+    ['foo'],
+    ['foo', 'bar'],
+])
+def git(repo_path, request):
     assert not os.system(
-        'cd {path} && git init && touch foo && git add foo && git commit -m "foo"'.format(path=repo_path))
+        'cd {path} && git init'.format(path=repo_path))
+    for commit in request.param:
+        assert not os.system(
+            'cd {p} && touch {c} && git add {c} && git commit -m {c}'.format(p=repo_path, c=commit))
     return GitVcs(path=repo_path)
 
 
@@ -67,12 +73,21 @@ def test_remove_ignored_files(git, repo_path):
 
 
 def test_get_signature(git, repo_path):
+    git.get_signature()  # get signature works
+
+    # check that signature is unique to file structure
     assert not os.system('cd {} && touch a && git add a'.format(repo_path))
     old_signature = git.get_signature()
     assert not os.system('cd {} && touch b && git add b'.format(repo_path))
     new_signature = git.get_signature()
     assert old_signature != new_signature
+
+    # bringing the repo back to the old structure retains the signature
     assert not os.system('cd {} && rm -f b && git rm b'.format(repo_path))
+    assert git.get_signature() == old_signature
+
+    # commiting does not change the signature
+    assert not os.system('cd {} && git commit -m commit'.format(repo_path))
     assert git.get_signature() == old_signature
 
 

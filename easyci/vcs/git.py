@@ -2,7 +2,7 @@ import hashlib
 import os
 import stat
 
-from easyci.vcs.base import Vcs
+from easyci.vcs.base import CommandError, Vcs
 
 
 class GitVcs(Vcs):
@@ -57,14 +57,24 @@ class GitVcs(Vcs):
         """
         return os.path.join(self.path, '.git/eci')
 
-    def get_signature(self):
+    def get_signature(self, base_commit=None):
         """Get the signature of the current state of the repository
+
+        Args:
+            base_commit - the base commit ('HEAD', sha, etc.)
 
         Returns:
             str
         """
-        sha = self.run('rev-parse', '--verify', 'HEAD').strip()
-        diff = self.run('diff', sha)
+        if base_commit is None:
+            base_commit = 'HEAD'
+        sha = self.run('rev-parse', '--verify', base_commit).strip()
+        diff = self.run('diff', sha).strip()
+        if len(diff) == 0:
+            try:
+                return self.get_signature(base_commit + '~1')
+            except CommandError:
+                pass
         h = hashlib.sha1()
         h.update(sha)
         h.update(diff)
