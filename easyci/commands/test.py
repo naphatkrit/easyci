@@ -6,9 +6,10 @@ from easyci.vcs.git import GitVcs
 
 
 @click.command()
-@click.option('--staged-only', '-s', is_flag=True, default=False, help='Test against staged version of the repo.')
+@click.option('--staged-only', '-s', is_flag=True, default=False, help='Test against staged version of the repo. Remove all unstaged and ignored files before running.')
+@click.option('--head-only', '-h', is_flag=True, default=False, help='Test against the current HEAD. Resets to HEAD and remove all ignored files before running.')
 @click.pass_context
-def test(ctx, staged_only):
+def test(ctx, staged_only, head_only):
     git = GitVcs()
     evidence_path = os.path.join(git.private_dir(), 'passed')
     known_signatures = []
@@ -17,7 +18,9 @@ def test(ctx, staged_only):
             known_signatures = f.read().split()
     with git.temp_copy() as copy:
         copy.remove_ignored_files()
-        if staged_only:
+        if head_only:
+            copy.clear('HEAD')
+        elif staged_only:
             copy.remove_unstaged_files()
         new_signature = copy.get_signature()
         if new_signature in known_signatures:

@@ -57,6 +57,21 @@ def test_staged_only(runner):
     assert 'OK' in result.output
 
 
+def test_head_only(runner):
+    with mock.patch('easyci.cli.load_user_config') as mocked:
+        mocked.return_value = mocked.return_value = {
+            'tests': ['true', 'true'],
+            'history_limit': 1,
+        }
+        result = runner.invoke(cli, ['test'])
+        assert result.exit_code == 0
+        assert not os.system('touch a && git add a')
+        assert not os.system('touch b')
+        result = runner.invoke(cli, ['test', '--head-only'])
+    assert result.exit_code == 0
+    assert 'OK' in result.output
+
+
 def test_run_twice_new_file(runner):
     with mock.patch('easyci.cli.load_user_config') as mocked:
         mocked.return_value = mocked.return_value = {
