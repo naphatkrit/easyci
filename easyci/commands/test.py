@@ -24,7 +24,7 @@ def test(ctx, staged_only, head_only):
             copy.remove_unstaged_files()
         new_signature = copy.get_signature()
         if new_signature in known_signatures:
-            click.echo(click.style('OK', bg='green', fg='black') + 'Files not changed.')
+            click.echo(click.style('OK', bg='green', fg='black') + ' Files not changed.')
             ctx.exit(0)
         with contextmanagers.chdir(copy.path):
             all_passed = True
