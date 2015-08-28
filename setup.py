@@ -19,9 +19,6 @@ setup(
     description='Local CI, for mortals.',
     packages=find_packages(),
     include_package_data=True,
-    package_data={
-        'easyci': ['hooks/*'],
-    },
     install_requires=install_requires,
     extras_require={'tests': tests_require},
     url='https://github.com/naphatkrit/easyci',
