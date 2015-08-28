@@ -1,0 +1,3 @@
+#!/bin/bash
+
+eci test --staged-only
