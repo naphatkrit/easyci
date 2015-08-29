@@ -25,5 +25,5 @@ def test_init(fake_vcs, runner):
     for pair in args:
         arg, _ = pair  # only get positional arguments
         calls.add(arg)
-    for hook in ['pre-push', 'pre-commit', 'commit-msg']:
+    for hook in ['pre-push', 'pre-commit']:
         assert (hook, get_hook(hook)) in calls

@@ -14,9 +14,12 @@ def init():
     # install hooks
     git = GitVcs()
     click.echo("Installing hooks")
-    git.install_hook('pre-commit', hooks_manager.get_hook('pre-commit'))
-    git.install_hook('pre-push', hooks_manager.get_hook('pre-push'))
-    git.install_hook('commit-msg', hooks_manager.get_hook('commit-msg'))
+    for old in ['commit-msg']:
+        path = os.path.join(git.path, '.git/hooks', old)
+        if os.path.exists(path):
+            os.remove(path)
+    for new in ['pre-commit', 'pre-push']:
+        git.install_hook(new, hooks_manager.get_hook(new))
 
     # add a config file if one does not exist
     config_path = os.path.join(git.path, 'eci.yaml')
