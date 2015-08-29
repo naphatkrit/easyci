@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+import sys
+
+from easyci.vcs.git import GitVcs
+from easyci.history import get_known_signatures
+
+
+def main(argv):
+    vcs = GitVcs()
+    known_signatures = get_known_signatures(vcs)
+    if vcs.get_signature() in known_signatures:
+        with open(argv[0], 'a') as f:
+            f.write('\n\n[EasyCI] tests passed\n')
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

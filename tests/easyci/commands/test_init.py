@@ -27,7 +27,10 @@ def test_init(fake_vcs, runner):
     with mock.patch('easyci.commands.init.GitVcs', new=lambda: fake_vcs):
         result = runner.invoke(cli, ['init'])
     assert result.exit_code == 0
-    (args1, _), (args2, _) = fake_vcs.install_hook.call_args_list
-    calls = set([args1, args2])
+    args = fake_vcs.install_hook.call_args_list
+    calls = set()
+    for pair in args:
+        arg, _ = pair  # only get positional arguments
+        calls.add(arg)
     assert ('pre-push', '#!/bin/bash\n\neci test --head-only\n') in calls
     assert ('pre-commit', '#!/bin/bash\n\neci test --staged-only\n') in calls

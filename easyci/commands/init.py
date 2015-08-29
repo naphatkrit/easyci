@@ -12,6 +12,7 @@ def init():
     click.echo("Installing hooks")
     git.install_hook('pre-commit', hooks_manager.get_hook('pre-commit'))
     git.install_hook('pre-push', hooks_manager.get_hook('pre-push'))
+    git.install_hook('commit-msg', hooks_manager.get_hook('commit-msg'))
 
     config_path = os.path.join(git.path, 'eci.yaml')
     if not os.path.exists(config_path):

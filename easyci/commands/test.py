@@ -1,6 +1,7 @@
 import click
 import os
 
+from easyci.history import get_known_signatures, add_signature
 from easyci.utils import contextmanagers
 from easyci.vcs.git import GitVcs
 
@@ -11,11 +12,7 @@ from easyci.vcs.git import GitVcs
 @click.pass_context
 def test(ctx, staged_only, head_only):
     git = GitVcs()
-    evidence_path = os.path.join(git.private_dir(), 'passed')
-    known_signatures = []
-    if os.path.exists(evidence_path):
-        with open(evidence_path, 'r') as f:
-            known_signatures = f.read().split()
+    known_signatures = get_known_signatures(git)
     with git.temp_copy() as copy:
         copy.remove_ignored_files()
         if head_only:
@@ -39,8 +36,4 @@ def test(ctx, staged_only, head_only):
     if not all_passed:
         ctx.exit(1)
     else:
-        known_signatures.append(new_signature)
-        string = '\n'.join(known_signatures[-ctx.obj['config']['history_limit']:])
-        # update evidence file
-        with open(evidence_path, 'w') as f:
-            f.write(string)
+        add_signature(git, ctx.obj['config'], new_signature)
