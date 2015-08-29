@@ -1,5 +1,5 @@
 import click
-import os
+import subprocess32 as subprocess
 
 from easyci.history import get_known_signatures, add_signature
 from easyci.utils import contextmanagers
@@ -27,7 +27,10 @@ def test(ctx, staged_only, head_only):
             all_passed = True
             for test in ctx.obj['config']['tests']:
                 click.echo('Running test: {}'.format(test))
-                ret = os.system(test)
+
+                # ok to use shell=True, as the whole point of EasyCI is to run
+                # arbitrary code
+                ret = subprocess.call(test, shell=True)
                 if ret == 0:
                     click.secho('Passed', bg='green', fg='black')
                 else:
