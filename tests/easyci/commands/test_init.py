@@ -3,6 +3,7 @@ import pytest
 import shutil
 import tempfile
 
+from easyci.hooks.hooks_manager import get_hook
 from easyci.vcs.base import Vcs
 from easyci.cli import cli
 
@@ -32,5 +33,5 @@ def test_init(fake_vcs, runner):
     for pair in args:
         arg, _ = pair  # only get positional arguments
         calls.add(arg)
-    assert ('pre-push', '#!/bin/bash\n\neci test --head-only\n') in calls
-    assert ('pre-commit', '#!/bin/bash\n\neci test --staged-only\n') in calls
+    for hook in ['pre-push', 'pre-commit', 'commit-msg']:
+        assert (hook, get_hook(hook)) in calls

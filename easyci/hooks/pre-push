@@ -1,3 +1,10 @@
 #!/bin/bash
 
 eci test --head-only
+
+CODE=$?
+
+if [ $CODE -ne 0 ]; then
+    echo 'Tests failed. To push anyways, run `git push --no-verify`.'
+    exit $CODE
+fi

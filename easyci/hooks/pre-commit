@@ -1,3 +1,10 @@
 #!/bin/bash
 
 eci test --staged-only
+
+CODE=$?
+
+if [ $CODE -ne 0 ]; then
+    echo 'Tests failed. To commit anyways, run `git commit --no-verify`.'
+    exit $CODE
+fi
