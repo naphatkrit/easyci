@@ -12,6 +12,7 @@ tests_require = [
 install_requires = [
     'Click>=5.0',
     'PyYAML>=3.11',
+    'subprocess32>=3.2.6',
 ]
 
 setup(

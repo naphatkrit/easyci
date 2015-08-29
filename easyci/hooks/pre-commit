@@ -1,10 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env python
 
-eci test --staged-only
+import subprocess32 as subprocess
+import sys
 
-CODE=$?
 
-if [ $CODE -ne 0 ]; then
-    echo 'Tests failed. To commit anyways, run `git commit --no-verify`.'
-    exit $CODE
-fi
+def main():
+    code = subprocess.call(['eci', 'test', '--staged-only'])
+    if code != 0:
+        print 'Tests failed. To commit anyways, run `git commit --no-verify`.'
+        sys.exit(code)
+
+if __name__ == "__main__":
+    main()
