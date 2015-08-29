@@ -1,26 +1,18 @@
 import mock
+import os
 import pytest
-import shutil
-import tempfile
 
 from easyci.hooks.hooks_manager import get_hook
 from easyci.vcs.base import Vcs
 from easyci.cli import cli
 
 
-@pytest.yield_fixture(scope='function')
-def repo_path():
-    path = tempfile.mkdtemp()
-    try:
-        yield path
-    finally:
-        shutil.rmtree(path)
-
-
 @pytest.fixture(scope='function')
-def fake_vcs(repo_path):
+def fake_vcs(runner):
+    repo_path = os.getcwd()
     vcs = mock.Mock(spec=Vcs)
     vcs.path = repo_path
+    vcs.private_dir.return_value = os.path.join(repo_path, '.git/eci')
     return vcs
 
 

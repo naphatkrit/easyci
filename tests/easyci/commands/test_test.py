@@ -1,8 +1,14 @@
 import mock
 import os
+import pytest
 
 from easyci.cli import cli
 from easyci.vcs.git import GitVcs
+
+
+@pytest.fixture(scope='function', autouse=True)
+def init(runner):
+    runner.invoke(cli, ['init'])
 
 
 def test_test_simple_failed(runner):

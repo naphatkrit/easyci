@@ -1,5 +1,8 @@
 from setuptools import setup, find_packages
 
+import easyci
+
+
 tests_require = [
     'flake8>=2.4.0',
     'pytest>=2.5.0',
@@ -13,7 +16,7 @@ install_requires = [
 
 setup(
     name='easyci',
-    version='1.2.1',
+    version=easyci.__version__,
     author='Naphat Sanguansin',
     author_email='naphat.krit@gmail.com',
     description='Local CI, for mortals.',
@@ -24,7 +27,7 @@ setup(
     install_requires=install_requires,
     extras_require={'tests': tests_require},
     url='https://github.com/naphatkrit/easyci',
-    download_url='https://github.com/naphatkrit/easyci/tarball/1.2.1',
+    download_url='https://github.com/naphatkrit/easyci/tarball/' + easyci.__version__,
     tests_require=tests_require,
     keywords=['continuous', 'integration', 'easy', 'ci',
               'gating', 'tests', 'testing', 'test', 'git'],
