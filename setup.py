@@ -13,7 +13,7 @@ install_requires = [
 
 setup(
     name='easyci',
-    version='1.2.0',
+    version='1.2.1',
     author='Naphat Sanguansin',
     author_email='naphat.krit@gmail.com',
     description='Local CI, for mortals.',
@@ -24,8 +24,10 @@ setup(
     install_requires=install_requires,
     extras_require={'tests': tests_require},
     url='https://github.com/naphatkrit/easyci',
-    download_url='https://github.com/naphatkrit/easyci/tarball/1.2.0',
+    download_url='https://github.com/naphatkrit/easyci/tarball/1.2.1',
     tests_require=tests_require,
+    keywords=['continuous', 'integration', 'easy', 'ci',
+              'gating', 'tests', 'testing', 'test', 'git'],
     entry_points='''
         [console_scripts]
         eci=easyci.cli:cli
