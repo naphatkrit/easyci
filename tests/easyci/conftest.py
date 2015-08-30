@@ -1,3 +1,4 @@
+import mock
 import os
 import pytest
 
@@ -14,3 +15,9 @@ def runner():
             f.write('{}')
         assert not os.system('git add eci.yaml && git commit -m "eci.yaml"')
         yield runner
+
+
+@pytest.yield_fixture(scope='session')
+def fake_hooks():
+    with mock.patch('easyci.hooks.hooks_manager.get_hook', new=lambda x: x):
+        yield
