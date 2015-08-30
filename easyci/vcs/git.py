@@ -109,3 +109,13 @@ class GitVcs(Vcs):
         with open(hook_path, 'w') as f:
             f.write(hook_content)
         os.chmod(hook_path, stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
+
+    def ignore_patterns_file(self):
+        """The ignore patterns file for this repo type.
+
+        e.g. .gitignore for git
+
+        Returns:
+            str - file name
+        """
+        return '.gitignore'

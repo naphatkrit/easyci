@@ -2,12 +2,23 @@ import mock
 import os
 import pytest
 
+from easyci.utils import contextmanagers
 from easyci.vcs.base import Vcs
 
 
 class DummyVcs(Vcs):
     def get_working_directory(self):
         return os.getcwd()
+
+    def ignore_patterns_file(self):
+        return '.dummyignore'
+
+
+@pytest.yield_fixture(scope='function')
+def temp_path():
+    with contextmanagers.temp_dir() as temp:
+        with contextmanagers.chdir(temp):
+            yield temp
 
 
 def test_init_with_path():
@@ -36,10 +47,15 @@ def test_init_without_path():
                 Vcs()
 
 
-def test_temp_copy():
+def test_temp_copy(temp_path):
     vcs = DummyVcs()
+    assert not os.system("echo '*.txt' > {}".format(vcs.ignore_patterns_file()))
+    assert not os.system("touch a.txt b")
     with vcs.temp_copy() as copy:
         assert isinstance(copy, DummyVcs)
         assert copy.path != vcs.path
         assert os.path.exists(copy.path)
+        assert os.path.exists(os.path.join(copy.path, copy.ignore_patterns_file()))
+        assert not os.path.exists(os.path.join(copy.path, 'a.txt'))
+        assert os.path.exists(os.path.join(copy.path, 'b'))
     assert not os.path.exists(copy.path)

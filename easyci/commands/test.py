@@ -14,7 +14,6 @@ def test(ctx, staged_only, head_only):
     git = GitVcs()
     known_signatures = get_known_signatures(git)
     with git.temp_copy() as copy:
-        copy.remove_ignored_files()
         if head_only:
             copy.clear('HEAD')
         elif staged_only:

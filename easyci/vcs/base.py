@@ -6,10 +6,9 @@ from __future__ import absolute_import
 
 import os
 import os.path
-import shutil
 
 from contextlib import contextmanager
-from subprocess import Popen, PIPE
+from subprocess32 import Popen, PIPE, check_call
 
 from easyci.utils import contextmanagers
 
@@ -138,17 +137,30 @@ class Vcs(object):
         """
         raise NotImplementedError
 
+    def ignore_patterns_file(self):
+        """The ignore patterns file for this repo type.
+
+        e.g. .gitignore for git
+
+        Returns:
+            str - file name
+        """
+        raise NotImplementedError
+
     @contextmanager
     def temp_copy(self):
         """Yields a new Vcs object that represents a temporary, disposable
         copy of the current repository. The copy is deleted at the end
         of the context.
 
+        Note that ignored files are not copied.
+
         Yields:
             Vcs
         """
         with contextmanagers.temp_dir() as temp_dir:
             temp_root_path = os.path.join(temp_dir, 'root')
-            shutil.copytree(self.path, temp_root_path)
+            path = os.path.join(self.path, '')  # adds trailing slash
+            check_call(['rsync', '-r', "--filter=dir-merge,- {}".format(self.ignore_patterns_file()), path, temp_root_path])
             copy = self.__class__(path=temp_root_path)
             yield copy
