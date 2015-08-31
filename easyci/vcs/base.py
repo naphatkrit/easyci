@@ -23,10 +23,10 @@ class CommandError(Exception):
 
     def __unicode__(self):
         return '%s returned %d:\nSTDOUT: %r\nSTDERR: %r' % (
-            self.cmd, self.retcode, self.stdout, self.stderr)
+            self.cmd, self.retcode, self.stdout, self.stderr)  # pragma: no cover
 
     def __str__(self):
-        return self.__unicode__().encode('utf-8')
+        return self.__unicode__().encode('utf-8')  # pragma: no cover
 
 
 class Vcs(object):
@@ -52,9 +52,6 @@ class Vcs(object):
             kwargs.setdefault('cwd', self.path)
 
         env = os.environ.copy()
-
-        for key, value in kwargs.pop('env', {}):
-            env[key] = value
 
         kwargs['env'] = env
         kwargs['stdout'] = PIPE
@@ -86,7 +83,7 @@ class Vcs(object):
         Raises:
             CommandError
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def install_hook(self, hook_name, hook_content):
         """Install the repository hook for this repo.
@@ -95,19 +92,19 @@ class Vcs(object):
             hook_name (str)
             hook_content (str)
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def remove_ignored_files(self):
         """Remove files ignored by the repository
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def remove_unstaged_files(self):
         """Remove all unstaged files. This does NOT remove ignored files.
 
         TODO this may be specific to git?
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def clear(self, target_commit):
         """Resets the repository to the target commit, removing any staged,
@@ -118,7 +115,7 @@ class Vcs(object):
         Raises:
             CommandError - if the commit does not exist
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def private_dir():
         """Get the private directory associated with this repo, but untracked
@@ -127,7 +124,7 @@ class Vcs(object):
         Returns:
             str - path
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def get_signature(self):
         """Get the signature of the current state of the repository
@@ -135,7 +132,7 @@ class Vcs(object):
         Returns:
             str
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def ignore_patterns_file(self):
         """The ignore patterns file for this repo type.
@@ -145,7 +142,7 @@ class Vcs(object):
         Returns:
             str - file name
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @contextmanager
     def temp_copy(self):
@@ -161,6 +158,7 @@ class Vcs(object):
         with contextmanagers.temp_dir() as temp_dir:
             temp_root_path = os.path.join(temp_dir, 'root')
             path = os.path.join(self.path, '')  # adds trailing slash
-            check_call(['rsync', '-r', "--filter=dir-merge,- {}".format(self.ignore_patterns_file()), path, temp_root_path])
+            check_call(['rsync', '-r', "--filter=dir-merge,- {}".format(
+                self.ignore_patterns_file()), path, temp_root_path])
             copy = self.__class__(path=temp_root_path)
             yield copy

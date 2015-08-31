@@ -1,6 +1,7 @@
 import mock
 import os
 import pytest
+import yaml
 
 from easyci.hooks import hooks_manager
 from easyci.vcs.base import Vcs
@@ -16,7 +17,7 @@ def fake_vcs(runner):
     return vcs
 
 
-def test_init(fake_vcs, runner, fake_hooks):
+def test_init_simple(fake_vcs, runner, fake_hooks):
     with mock.patch('easyci.commands.init.GitVcs', new=lambda: fake_vcs):
         result = runner.invoke(cli, ['init'])
     assert result.exit_code == 0
@@ -27,3 +28,23 @@ def test_init(fake_vcs, runner, fake_hooks):
         calls.add(arg)
     for hook in ['pre-push', 'pre-commit']:
         assert (hook, hooks_manager.get_hook(hook)) in calls
+
+
+def test_init_stale_hooks(fake_vcs, runner, fake_hooks):
+    stale_hook_path = os.path.join(fake_vcs.path, '.git/hooks/commit-msg')
+    assert not os.system('touch {}'.format(stale_hook_path))
+    with mock.patch('easyci.commands.init.GitVcs', new=lambda: fake_vcs):
+        result = runner.invoke(cli, ['init'])
+    assert result.exit_code == 0
+    assert not os.path.exists(stale_hook_path)
+
+
+def test_init_no_config(fake_vcs, runner, fake_hooks):
+    config_path = os.path.join(fake_vcs.path, 'eci.yaml')
+    os.remove(config_path)
+    with mock.patch('easyci.commands.init.GitVcs', new=lambda: fake_vcs):
+        result = runner.invoke(cli, ['init'])
+    assert result.exit_code == 0
+    assert os.path.exists(config_path)
+    with open(config_path, 'r') as f:
+        yaml.safe_load(f.read())
