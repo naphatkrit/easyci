@@ -9,7 +9,10 @@ from easyci.vcs.git import GitVcs
 from easyci.version import get_installed_version, VersionNotInstalledError
 
 
-@click.group()
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+
+@click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option(version=easyci.__version__, prog_name='EasyCI')
 @click.pass_context
 def cli(ctx):

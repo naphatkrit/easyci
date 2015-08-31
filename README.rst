@@ -86,11 +86,18 @@ key                       type                 Description
 
 Commands
 --------
+All commands should be run inside the target repository.
+
 eci init
 +++++++++++++
-This command is to be run inside the target repository. This installs the necessary hooks (pre-push + pre-commit) to check if tests have been run for the current commit.
+Initialize the project for use with EasyCI. This installs the necessary git hooks (pre-commit + pre-push) and add a config file if one does not already exists.
 
 
 eci test
 ++++++++
-This command creates a copy of your project and remove any ignored files before running tests. If tests pass, then it stores a hash representing the current state of your project in :code:`.git/eci/passed`.
+Run tests. If a passing test run is found in the tests run history, then this does not run any tests.
+
+
+eci clear-history
++++++++++++++++++
+Clear tests run history. History is normally used to keep track of whether a test has been run for a specific state of the project, to avoid running tests redundantly. This command clears the history, causing the next `eci test` command to always run tests.

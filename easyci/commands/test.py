@@ -16,6 +16,9 @@ from easyci.vcs.git import GitVcs
 @click.option('--head-only', '-h', is_flag=True, default=False, help='Test against the current HEAD. Resets to HEAD and remove all ignored files before running.')
 @click.pass_context
 def test(ctx, staged_only, head_only):
+    """Run tests. If a passing test run is found in the tests run history,
+    then this does not run any tests.
+    """
     git = GitVcs()
 
     click.echo('Making a temporary copy of your project...', nl=False)

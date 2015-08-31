@@ -11,6 +11,10 @@ from easyci.version import set_installed_version
 
 @click.command()
 def init():
+    """Initialize the project for use with EasyCI. This installs the necessary
+    git hooks (pre-commit + pre-push) and add a config file if one does not
+    already exists.
+    """
     # install hooks
     git = GitVcs()
     click.echo("Installing hooks...", nl=False)
