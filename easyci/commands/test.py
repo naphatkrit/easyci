@@ -3,6 +3,10 @@ import subprocess32 as subprocess
 
 from easyci.history import get_known_signatures, add_signature
 from easyci.utils import contextmanagers
+from easyci.user_config import (
+    load_user_config, ConfigFormatError, ConfigNotFoundError,
+    _default_config
+)
 from easyci.vcs.git import GitVcs
 
 
@@ -12,19 +16,30 @@ from easyci.vcs.git import GitVcs
 @click.pass_context
 def test(ctx, staged_only, head_only):
     git = GitVcs()
+
     known_signatures = get_known_signatures(git)
     with git.temp_copy() as copy:
         if head_only:
             copy.clear('HEAD')
         elif staged_only:
             copy.remove_unstaged_files()
+
+        try:
+            config = load_user_config(copy)
+        except ConfigFormatError:
+            click.echo("Invalid config")
+            ctx.abort()
+        except ConfigNotFoundError:
+            click.echo("No config file")
+            config = _default_config
+
         new_signature = copy.get_signature()
         if new_signature in known_signatures:
             click.echo(click.style('OK', bg='green', fg='black') + ' Files not changed.')
             ctx.exit(0)
         with contextmanagers.chdir(copy.path):
             all_passed = True
-            for test in ctx.obj['config']['tests']:
+            for test in config['tests']:
                 click.echo('Running test: {}'.format(test))
 
                 # ok to use shell=True, as the whole point of EasyCI is to run
@@ -35,7 +50,7 @@ def test(ctx, staged_only, head_only):
                 else:
                     click.secho('Failed', bg='red', fg='black')
                     all_passed = False
-    if not all_passed:
-        ctx.exit(1)
-    else:
-        add_signature(git, ctx.obj['config'], new_signature)
+        if not all_passed:
+            ctx.exit(1)
+        else:
+            add_signature(git, config, new_signature)

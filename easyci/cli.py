@@ -4,10 +4,6 @@ import easyci
 
 from easyci.commands.init import init
 from easyci.commands.test import test
-from easyci.user_config import (
-    load_user_config, ConfigFormatError, ConfigNotFoundError,
-    _default_config
-)
 from easyci.vcs.git import GitVcs
 from easyci.version import get_installed_version, VersionNotInstalledError
 
@@ -26,16 +22,6 @@ def cli(ctx):
         if version != easyci.__version__:
             click.echo('EasyCI version mismatch. Please rerun `eci init`.')
             ctx.abort()
-    try:
-        config = load_user_config(git)
-    except ConfigFormatError:
-        click.echo("Invalid config")
-        ctx.abort()
-    except ConfigNotFoundError:
-        click.echo("No config file")
-        config = _default_config
-    ctx.obj = dict()
-    ctx.obj['config'] = config
 
 cli.add_command(init)
 cli.add_command(test)
