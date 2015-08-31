@@ -18,15 +18,22 @@ from easyci.vcs.git import GitVcs
 def test(ctx, staged_only, head_only):
     git = GitVcs()
 
-    known_signatures = get_known_signatures(git)
+    click.echo('Making a temporary copy of your project...', nl=False)
     with git.temp_copy() as copy:
+        click.echo('Done.')
         if head_only:
+            click.echo('Resetting to HEAD...', nl=False)
             copy.clear('HEAD')
+            click.echo('Done.')
         elif staged_only:
+            click.echo('Resetting to staged files...', nl=False)
             copy.remove_unstaged_files()
+            click.echo('Done.')
 
+        click.echo('Loading config file...', nl=False)
         try:
             config = load_user_config(copy)
+            click.echo('Done.')
         except ConfigFormatError:
             click.echo("Invalid config")
             ctx.abort()
@@ -34,10 +41,15 @@ def test(ctx, staged_only, head_only):
             click.echo("No config file")
             config = _default_config
 
+        click.echo('Checking if tests were already ran...', nl=False)
+        known_signatures = get_known_signatures(copy)
         new_signature = copy.get_signature()
         if new_signature in known_signatures:
-            click.echo(click.style('OK', bg='green', fg='black') + ' Files not changed.')
+            click.echo('')
+            click.echo(click.style('OK', bg='green', fg='black') +
+                       ' Tests already ran.')
             ctx.exit(0)
+        click.echo('Done.')
         with contextmanagers.chdir(copy.path):
             all_passed = True
             for test in config['tests']:
@@ -53,9 +65,14 @@ def test(ctx, staged_only, head_only):
                     all_passed = False
 
         # collect results
-        includes = ['--include={}'.format(x) for x in config['collect_results']]
-        cmd = ['rsync', '-r'] + includes + ['--exclude=*', os.path.join(copy.path, ''), os.path.join(git.path, '')]
-        subprocess.check_call(cmd)
+        if len(config['collect_results']) > 0:
+            click.echo('Collecting test results...', nl=False)
+            includes = ['--include={}'.format(x)
+                        for x in config['collect_results']]
+            cmd = ['rsync', '-r'] + includes + ['--exclude=*',
+                                                os.path.join(copy.path, ''), os.path.join(git.path, '')]
+            subprocess.check_call(cmd)
+            click.echo('Done.')
 
         if not all_passed:
             ctx.exit(1)
