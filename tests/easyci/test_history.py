@@ -3,7 +3,7 @@ import os
 import pytest
 
 from easyci.history import (
-    add_signature, get_known_signatures, _get_history_path
+    add_signature, clear_history, get_known_signatures, _get_history_path
 )
 from easyci.utils import contextmanagers
 from easyci.vcs.base import Vcs
@@ -56,3 +56,17 @@ def test_add_signature(fake_vcs, fake_user_config):
 
     with open(history_path, 'r') as f:
         assert f.read().strip().split() == signatures
+
+
+def test_clear_history(fake_vcs):
+    history_path = _get_history_path(fake_vcs)
+    assert not os.path.exists(history_path)
+    clear_history(fake_vcs)  # when file does not exist
+    assert not os.path.exists(history_path)
+
+    with open(history_path, 'w') as f:
+        f.write('test')
+    assert os.path.exists(history_path)
+
+    clear_history(fake_vcs)
+    assert not os.path.exists(history_path)

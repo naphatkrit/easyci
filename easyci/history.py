@@ -44,3 +44,14 @@ def add_signature(vcs, user_config, signature):
     string = '\n'.join(known_signatures[-user_config['history_limit']:])
     with open(evidence_path, 'w') as f:
         f.write(string)
+
+
+def clear_history(vcs):
+    """Clear test run history from this project.
+
+    Args:
+        vcs (easyci.vcs.base.Vcs)
+    """
+    evidence_path = _get_history_path(vcs)
+    if os.path.exists(evidence_path):
+        os.remove(evidence_path)

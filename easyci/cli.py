@@ -2,6 +2,7 @@ import click
 
 import easyci
 
+from easyci.commands.clear_history import clear_history
 from easyci.commands.init import init
 from easyci.commands.test import test
 from easyci.vcs.git import GitVcs
@@ -23,5 +24,6 @@ def cli(ctx):
             click.echo('EasyCI version mismatch. Please rerun `eci init`.')
             ctx.abort()
 
+cli.add_command(clear_history)
 cli.add_command(init)
 cli.add_command(test)
