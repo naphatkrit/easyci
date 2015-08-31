@@ -7,6 +7,7 @@ tests_require = [
     'flake8>=2.4.0',
     'pytest>=2.5.0',
     'mock>=1.0.0',
+    'coverage>=3.7.1',
 ]
 
 install_requires = [
