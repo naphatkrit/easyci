@@ -1,4 +1,5 @@
 import click
+import os
 import subprocess32 as subprocess
 
 from easyci.history import get_known_signatures, add_signature
@@ -50,6 +51,12 @@ def test(ctx, staged_only, head_only):
                 else:
                     click.secho('Failed', bg='red', fg='black')
                     all_passed = False
+
+        # collect results
+        includes = ['--include={}'.format(x) for x in config['collect_results']]
+        cmd = ['rsync', '-r'] + includes + ['--exclude=*', os.path.join(copy.path, ''), os.path.join(git.path, '')]
+        subprocess.check_call(cmd)
+
         if not all_passed:
             ctx.exit(1)
         else:

@@ -31,6 +31,7 @@ def test_test_simple_failed(runner):
         mocked.return_value = mocked.return_value = {
             'tests': ['true', 'false'],
             'history_limit': 1,
+            'collect_results': [],
         }
         result = runner.invoke(cli, ['test'])
     assert result.exit_code == 1
@@ -43,6 +44,7 @@ def test_test_simple_passed(runner):
         mocked.return_value = mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': 1,
+            'collect_results': [],
         }
         result = runner.invoke(cli, ['test'])
     assert result.exit_code == 0
@@ -55,6 +57,7 @@ def test_run_twice(runner):
         mocked.return_value = mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': 1,
+            'collect_results': [],
         }
         result = runner.invoke(cli, ['test'])
         assert result.exit_code == 0
@@ -68,6 +71,7 @@ def test_staged_only(runner):
         mocked.return_value = mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': 1,
+            'collect_results': [],
         }
         assert not os.system('touch a && git add a && echo a > a')
         result = runner.invoke(cli, ['test', '--staged-only'])
@@ -83,6 +87,7 @@ def test_head_only(runner):
         mocked.return_value = mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': 1,
+            'collect_results': [],
         }
         result = runner.invoke(cli, ['test'])
         assert result.exit_code == 0
@@ -98,6 +103,7 @@ def test_run_twice_new_file(runner):
         mocked.return_value = mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': 1,
+            'collect_results': [],
         }
         assert not os.system('touch a')
         result = runner.invoke(cli, ['test'])
@@ -114,6 +120,7 @@ def test_history_limit(runner):
         mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': history_limit,
+            'collect_results': [],
         }
         for x in range(history_limit + 1):
             assert not os.system('touch {x} && git add {x}'.format(x=x))
@@ -126,3 +133,20 @@ def test_history_limit(runner):
         signatures = f.read().split()
         assert len(signatures) == history_limit
         assert signatures[-1] == git.get_signature()
+
+
+def test_collect_results(runner):
+    files = ['a.txt1', 'b.txt1', 'c.txt1']
+    result_files = ['a.txt', 'b.txt', 'c.txt']
+    with mock.patch('easyci.commands.test.load_user_config') as mocked:
+        mocked.return_value = {
+            'tests': ['touch ' + ' '.join(result_files + files)],
+            'history_limit': 0,
+            'collect_results': ['*.txt'],
+        }
+        result = runner.invoke(cli, ['test'])
+    assert result.exit_code == 0
+    for f in files:
+        assert not os.path.exists(f)
+    for f in result_files:
+        assert os.path.exists(f)
