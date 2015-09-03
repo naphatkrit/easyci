@@ -51,9 +51,9 @@ class Vcs(object):
             # only None when called in the __init__ function
             kwargs.setdefault('cwd', self.path)
 
-        env = os.environ.copy()
-
-        kwargs['env'] = env
+        # NOTE if we do want to make a copy of environmental variables,
+        # we must remove GIT_WORK_TREE
+        kwargs['env'] = {}
         kwargs['stdout'] = PIPE
         kwargs['stderr'] = PIPE
 
