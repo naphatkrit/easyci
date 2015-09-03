@@ -1,7 +1,5 @@
 EasyCI
 ======
-*CI for mortals*
-
 **Note**: EasyCI only works with git repositories.
 
 Never worry about checking in broken code again. No need to maintain a CI server. No need to shell out ridiculous amount of money for your personal project. EasyCI puts your mind at ease, like a good CI service, but without all the extra costs.
