@@ -117,12 +117,22 @@ class Vcs(object):
         """
         raise NotImplementedError  # pragma: no cover
 
-    def private_dir():
+    def private_dir(self):
         """Get the private directory associated with this repo, but untracked
         by the repo.
 
         Returns:
-            str - path
+            str - absolute path
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    def repository_dir(self):
+        """Get the directory used by the VCS to store repository info.
+
+        e.g. .git for git
+
+        Returns:
+            str - absolute path
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -141,6 +151,25 @@ class Vcs(object):
 
         Returns:
             str - file name
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    def get_ignored_files(self):
+        """Returns the list of files being ignored in this repository.
+
+        Note that file names, not directories, are returned.
+
+        So, we will get the following:
+
+        a/b.txt
+        a/c.txt
+
+        instead of just:
+
+        a/
+
+        Returns:
+            List[str] - list of ignored files. The paths are relative to the repo.
         """
         raise NotImplementedError  # pragma: no cover
 

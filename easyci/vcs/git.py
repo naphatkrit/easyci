@@ -65,9 +65,19 @@ class GitVcs(Vcs):
         by the repo.
 
         Returns:
-            str - path
+            str - absolute path
         """
-        return os.path.join(self.path, '.git/eci')
+        return os.path.join(self.repository_dir(), 'eci')
+
+    def repository_dir(self):
+        """Get the directory used by the VCS to store repository info.
+
+        e.g. .git for git
+
+        Returns:
+            str - absolute path
+        """
+        return os.path.join(self.path, '.git')
 
     def get_signature(self, base_commit=None):
         """Get the signature of the current state of the repository
@@ -109,6 +119,28 @@ class GitVcs(Vcs):
         with open(hook_path, 'w') as f:
             f.write(hook_content)
         os.chmod(hook_path, stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
+
+    def get_ignored_files(self):
+        """Returns the list of files being ignored in this repository.
+
+        Note that file names, not directories, are returned.
+
+        So, we will get the following:
+
+        a/b.txt
+        a/c.txt
+
+        instead of just:
+
+        a/
+
+        Returns:
+            List[str] - list of ignored files. The paths are absolute.
+        """
+        return [os.path.join(self.path, p) for p in
+                self.run('ls-files', '--ignored', '--exclude-standard',
+                         '--others').strip().split()
+                ]
 
     def ignore_patterns_file(self):
         """The ignore patterns file for this repo type.

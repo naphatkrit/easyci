@@ -4,6 +4,7 @@ import shutil
 import stat
 import tempfile
 
+from easyci.utils import contextmanagers
 from easyci.vcs.base import CommandError
 from easyci.vcs.git import GitVcs
 
@@ -111,8 +112,20 @@ def test_get_signature(git, repo_path):
     assert git.get_signature() == old_signature
 
 
+def test_get_ignored_files(git, repo_path):
+    with contextmanagers.chdir(repo_path):
+        with open('.gitignore', 'w') as f:
+            f.write('a\n')
+        assert not os.system('mkdir a && touch a/1.txt a/2.txt')
+        assert set(git.get_ignored_files()) == set([os.path.join(repo_path, 'a/1.txt'), os.path.join(repo_path, 'a/2.txt')])
+
+
 def test_private_dir(git, repo_path):
     private_dir = git.private_dir()
     assert os.path.join(repo_path, '.git/eci') == private_dir
     assert os.path.exists(private_dir)
     assert os.path.isdir(private_dir)
+
+
+def test_repository_dir(git, repo_path):
+    assert os.path.join(repo_path, '.git') == git.repository_dir()
