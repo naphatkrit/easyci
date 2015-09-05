@@ -21,7 +21,7 @@ def init(runner):
 
 
 def test_clear_history(runner, fake_vcs):
-    with mock.patch('easyci.commands.clear_history.GitVcs', new=lambda: fake_vcs):
+    with mock.patch('easyci.cli.GitVcs', new=lambda: fake_vcs):
         with mock.patch('easyci.commands.clear_history.clear_history_internal') as mocked:
             result = runner.invoke(cli, ['clear-history'])
     mocked.assert_called_once_with(fake_vcs)

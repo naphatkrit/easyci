@@ -18,7 +18,7 @@ def fake_vcs(runner):
 
 
 def test_init_simple(fake_vcs, runner, fake_hooks):
-    with mock.patch('easyci.commands.init.GitVcs', new=lambda: fake_vcs):
+    with mock.patch('easyci.cli.GitVcs', new=lambda: fake_vcs):
         result = runner.invoke(cli, ['init'])
     assert result.exit_code == 0
     args = fake_vcs.install_hook.call_args_list
@@ -33,7 +33,7 @@ def test_init_simple(fake_vcs, runner, fake_hooks):
 def test_init_stale_hooks(fake_vcs, runner, fake_hooks):
     stale_hook_path = os.path.join(fake_vcs.path, '.git/hooks/commit-msg')
     assert not os.system('touch {}'.format(stale_hook_path))
-    with mock.patch('easyci.commands.init.GitVcs', new=lambda: fake_vcs):
+    with mock.patch('easyci.cli.GitVcs', new=lambda: fake_vcs):
         result = runner.invoke(cli, ['init'])
     assert result.exit_code == 0
     assert not os.path.exists(stale_hook_path)
@@ -42,7 +42,7 @@ def test_init_stale_hooks(fake_vcs, runner, fake_hooks):
 def test_init_no_config(fake_vcs, runner, fake_hooks):
     config_path = os.path.join(fake_vcs.path, 'eci.yaml')
     os.remove(config_path)
-    with mock.patch('easyci.commands.init.GitVcs', new=lambda: fake_vcs):
+    with mock.patch('easyci.cli.GitVcs', new=lambda: fake_vcs):
         result = runner.invoke(cli, ['init'])
     assert result.exit_code == 0
     assert os.path.exists(config_path)

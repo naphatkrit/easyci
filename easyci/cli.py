@@ -26,6 +26,8 @@ def cli(ctx):
         if version != easyci.__version__:
             click.echo('EasyCI version mismatch. Please rerun `eci init`.')
             ctx.abort()
+    ctx.obj = dict()
+    ctx.obj['vcs'] = git
 
 cli.add_command(clear_history)
 cli.add_command(init)

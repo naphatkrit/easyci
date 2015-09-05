@@ -8,7 +8,6 @@ from easyci.user_config import (
     load_user_config, ConfigFormatError, ConfigNotFoundError,
     _default_config
 )
-from easyci.vcs.git import GitVcs
 
 
 @click.command()
@@ -19,7 +18,7 @@ def test(ctx, staged_only, head_only):
     """Run tests. If a passing test run is found in the tests run history,
     then this does not run any tests.
     """
-    git = GitVcs()
+    git = ctx.obj['vcs']
 
     click.echo('Making a temporary copy of your project...', nl=False)
     with git.temp_copy() as copy:

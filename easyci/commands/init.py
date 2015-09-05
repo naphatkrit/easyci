@@ -5,18 +5,18 @@ import yaml
 import easyci
 
 from easyci.hooks import hooks_manager
-from easyci.vcs.git import GitVcs
 from easyci.version import set_installed_version
 
 
 @click.command()
-def init():
+@click.pass_context
+def init(ctx):
     """Initialize the project for use with EasyCI. This installs the necessary
     git hooks (pre-commit + pre-push) and add a config file if one does not
     already exists.
     """
     # install hooks
-    git = GitVcs()
+    git = ctx.obj['vcs']
     click.echo("Installing hooks...", nl=False)
     for old in ['commit-msg']:
         path = os.path.join(git.path, '.git/hooks', old)
