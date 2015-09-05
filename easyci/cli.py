@@ -5,6 +5,7 @@ import easyci
 from easyci.commands.clear_history import clear_history
 from easyci.commands.init import init
 from easyci.commands.test import test
+from easyci.commands.watch import watch
 from easyci.vcs.git import GitVcs
 from easyci.version import get_installed_version, VersionNotInstalledError
 
@@ -32,3 +33,4 @@ def cli(ctx):
 cli.add_command(clear_history)
 cli.add_command(init)
 cli.add_command(test)
+cli.add_command(watch)

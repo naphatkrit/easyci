@@ -16,6 +16,7 @@ install_requires = [
     'filelock>=2.0.4',
     'PyYAML>=3.11',
     'subprocess32>=3.2.6',
+    'watchdog>=0.8.2',
 ]
 
 setup(
