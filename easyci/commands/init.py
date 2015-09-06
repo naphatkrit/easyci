@@ -4,6 +4,7 @@ import yaml
 
 import easyci
 
+from easyci import locking
 from easyci.hooks import hooks_manager
 from easyci.version import set_installed_version
 
@@ -34,6 +35,9 @@ def init(ctx):
             f.write(yaml.safe_dump(
                 {'tests': ['echo please modify to run your tests', 'true']}))
         click.echo("Done.")
+
+    # initialize lock
+    locking.init(git)
 
     # update installed version
     click.echo("Updating installed version...", nl=False)

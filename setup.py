@@ -12,6 +12,8 @@ tests_require = [
 
 install_requires = [
     'Click>=5.0',
+    'enum34>=1.0.4',
+    'filelock>=2.0.4',
     'PyYAML>=3.11',
     'subprocess32>=3.2.6',
 ]
