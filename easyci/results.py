@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess32 as subprocess
 
 
@@ -43,6 +44,8 @@ def sync_results(vcs, signature):
     Args:
         vcs (easyci.vcs.base.Vcs)
         signature (str)
+    Raises:
+        ResultsNotFoundError
     """
     results_directory = _get_results_directory(vcs, signature)
     if not os.path.exists(results_directory):
@@ -52,6 +55,38 @@ def sync_results(vcs, signature):
     includes = ['--include={}'.format(x)
                 for x in patterns]
     cmd = ['rsync', '-r'] + includes + ['--exclude=*',
-                                        os.path.join(results_directory, 'results', ''),
+                                        os.path.join(
+                                            results_directory, 'results', ''),
                                         os.path.join(vcs.path, '')]
     subprocess.check_call(cmd)
+
+
+def remove_results(vcs, signature):
+    """Removed saved results for this signature
+
+    Args:
+        vcs (easyci.vcs.base.Vcs)
+        signature (str)
+    Raises:
+        ResultsNotFoundError
+    """
+    results_directory = _get_results_directory(vcs, signature)
+    if not os.path.exists(results_directory):
+        raise ResultsNotFoundError
+    shutil.rmtree(results_directory)
+
+
+def get_signatures_with_results(vcs):
+    """Returns the list of signatures for which test results are saved.
+
+    Args:
+        vcs (easyci.vcs.base.Vcs)
+
+    Returns:
+        List[str]
+    """
+    results_dir = os.path.join(vcs.private_dir(), 'results')
+    if not os.path.exists(results_dir):
+        return []
+    rel_paths = os.listdir(results_dir)
+    return [p for p in rel_paths if os.path.isdir(os.path.join(results_dir, p))]

@@ -86,24 +86,20 @@ def test(ctx, staged_only, head_only):
                     click.secho('Failed', bg='red', fg='black')
                     all_passed = False
 
-        # collect results
-        if len(config['collect_results']) > 0:
-            click.echo('Collecting results...', nl=False)
-            save_results(git, new_signature, copy.path,
-                         config['collect_results'])
-            click.echo('Done')
+        with locking.lock(git, locking.Lock.tests_history):
+            # collect results
+            if len(config['collect_results']) > 0:
+                click.echo('Collecting results...', nl=False)
+                save_results(git, new_signature, copy.path,
+                             config['collect_results'])
+                click.echo('Done')
+                click.echo('Syncing test results...', nl=False)
+                sync_results(git, new_signature)
+                click.echo('Done')
 
-    with locking.lock(git, locking.Lock.tests_history):
-        try:
-            click.echo('Syncing test results...', nl=False)
-            sync_results(git, new_signature)
-            click.echo('Done')
-        except ResultsNotFoundError:
-            click.echo('No results to sync.')
-
-        # save signature
-        if not all_passed:
-            unstage_signature(git, new_signature)
-            ctx.exit(1)
-        else:
-            commit_signature(git, config, new_signature)
+            # save signature
+            if not all_passed:
+                unstage_signature(git, new_signature)
+                ctx.exit(1)
+            else:
+                commit_signature(git, config, new_signature)

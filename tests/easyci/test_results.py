@@ -3,7 +3,8 @@ import pytest
 
 from easyci.results import (
     _get_results_directory, save_results, sync_results,
-    ResultsNotFoundError,
+    ResultsNotFoundError, get_signatures_with_results,
+    remove_results
 )
 from easyci.vcs.base import Vcs
 from easyci.utils import contextmanagers
@@ -71,3 +72,27 @@ def test_sync_results(vcs):
 def test_sync_results_not_found(vcs):
     with pytest.raises(ResultsNotFoundError):
         sync_results(vcs, 'signature1')
+
+
+def test_remove_results(vcs):
+    # empty case
+    with pytest.raises(ResultsNotFoundError):
+        remove_results(vcs, 'signature1')
+
+    # non-empty case
+    results_dir = _get_results_directory(vcs, 'signature1')
+    os.makedirs(results_dir)
+    assert not os.system('touch {}'.format(os.path.join(results_dir, 'a')))
+    remove_results(vcs, 'signature1')
+    assert not os.path.exists(results_dir)
+
+
+def test_get_signatures_with_results(vcs):
+    assert get_signatures_with_results(vcs) == []
+
+    os.makedirs(_get_results_directory(vcs, 'signature1'))
+    assert get_signatures_with_results(vcs) == ['signature1']
+
+    os.makedirs(_get_results_directory(vcs, 'signature2'))
+    assert set(get_signatures_with_results(vcs)) == set(
+        ['signature1', 'signature2'])
