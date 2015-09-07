@@ -2,7 +2,11 @@ import click
 import os
 import subprocess32 as subprocess
 
-from easyci.history import get_known_signatures, add_signature
+from easyci import locking
+from easyci.history import (
+    commit_signature, get_committed_signatures, get_staged_signatures,
+    stage_signature, unstage_signature,
+)
 from easyci.utils import contextmanagers
 from easyci.user_config import (
     load_user_config, ConfigFormatError, ConfigNotFoundError,
@@ -44,13 +48,25 @@ def test(ctx, staged_only, head_only):
             config = _default_config
 
         click.echo('Checking if tests were already ran...', nl=False)
-        known_signatures = get_known_signatures(copy)
         new_signature = copy.get_signature()
-        if new_signature in known_signatures:
+
+        in_committed = False
+        in_staged = False
+        with locking.lock(git, locking.Lock.tests_history):
+            in_committed = new_signature in get_committed_signatures(git)
+            in_staged = new_signature in get_staged_signatures(git)
+            if not in_committed and not in_staged:
+                stage_signature(git, new_signature)
+        if in_committed:
             click.echo('')
             click.echo(click.style('OK', bg='green', fg='black') +
                        ' Tests already ran.')
             ctx.exit(0)
+        if in_staged:
+            click.echo('')
+            click.echo(click.style('In Progress', bg='yellow', fg='black') +
+                       ' Tests already running.')
+            ctx.abort()
         click.echo('Done.')
         with contextmanagers.chdir(copy.path):
             all_passed = True
@@ -66,17 +82,20 @@ def test(ctx, staged_only, head_only):
                     click.secho('Failed', bg='red', fg='black')
                     all_passed = False
 
-        # collect results
-        if len(config['collect_results']) > 0:
-            click.echo('Collecting test results...', nl=False)
-            includes = ['--include={}'.format(x)
-                        for x in config['collect_results']]
-            cmd = ['rsync', '-r'] + includes + ['--exclude=*',
-                                                os.path.join(copy.path, ''), os.path.join(git.path, '')]
-            subprocess.check_call(cmd)
-            click.echo('Done.')
+        with locking.lock(git, locking.Lock.tests_history):
+            # collect results
+            if len(config['collect_results']) > 0:
+                click.echo('Collecting test results...', nl=False)
+                includes = ['--include={}'.format(x)
+                            for x in config['collect_results']]
+                cmd = ['rsync', '-r'] + includes + ['--exclude=*',
+                                                    os.path.join(copy.path, ''), os.path.join(git.path, '')]
+                subprocess.check_call(cmd)
+                click.echo('Done.')
 
-        if not all_passed:
-            ctx.exit(1)
-        else:
-            add_signature(git, config, new_signature)
+            # save signature
+            if not all_passed:
+                unstage_signature(git, new_signature)
+                ctx.exit(1)
+            else:
+                commit_signature(git, config, new_signature)

@@ -3,7 +3,11 @@ import os
 import pytest
 
 from easyci.history import (
-    add_signature, clear_history, get_known_signatures, _get_history_path
+    commit_signature, clear_history,
+    stage_signature, unstage_signature,
+    _get_committed_history_path, _get_staged_history_path,
+    NotStagedError, AlreadyStagedError, AlreadyCommittedError,
+    get_committed_signatures, get_staged_signatures,
 )
 from easyci.utils import contextmanagers
 from easyci.vcs.base import Vcs
@@ -32,34 +36,97 @@ def fake_user_config():
     }
 
 
-def test_get_known_signatures(fake_vcs):
-    assert get_known_signatures(fake_vcs) == []
+def test_get_committed_signatures(fake_vcs):
+    assert get_committed_signatures(fake_vcs) == []
 
+    # test committed
     signatures = ['signature1', 'signature2', 'signature3']
-    with open(_get_history_path(fake_vcs), 'w') as f:
+    with open(_get_committed_history_path(fake_vcs), 'w') as f:
         f.write('\n'.join(signatures))
 
-    assert get_known_signatures(fake_vcs) == signatures
+    # order is guaranteed for committed history
+    assert get_committed_signatures(fake_vcs) == signatures
 
 
-def test_add_signature(fake_vcs, fake_user_config):
-    history_path = _get_history_path(fake_vcs)
+def test_get_staged_signatures(fake_vcs):
+    assert get_staged_signatures(fake_vcs) == []
 
-    add_signature(fake_vcs, fake_user_config, 'signature1')
-    with open(history_path, 'r') as f:
+    # test committed
+    signatures = ['signature1', 'signature2', 'signature3']
+    with open(_get_staged_history_path(fake_vcs), 'w') as f:
+        f.write('\n'.join(signatures))
+
+    # order is not guaranteed for staged history
+    assert set(get_staged_signatures(fake_vcs)) == set(signatures)
+
+
+def test_commit_signature(fake_vcs, fake_user_config):
+    stage_signature(fake_vcs, 'dummy')
+    committed_path = _get_committed_history_path(fake_vcs)
+    staged_path = _get_staged_history_path(fake_vcs)
+
+    # test unstaged
+    with pytest.raises(NotStagedError):
+        commit_signature(fake_vcs, fake_user_config, 'signature1')
+
+    # test staged
+    stage_signature(fake_vcs, 'signature1')
+    commit_signature(fake_vcs, fake_user_config, 'signature1')
+    with open(committed_path, 'r') as f:
         assert f.read().strip().split() == ['signature1']
+    with open(staged_path, 'r') as f:
+        assert f.read().strip().split() == ['dummy']
 
-    signatures = ['signature' + str(i) for i in range(fake_user_config['history_limit'])]
+    # test commit twice
+    stage_signature(fake_vcs, 'signature1')
+    with pytest.raises(AlreadyCommittedError):
+        commit_signature(fake_vcs, fake_user_config, 'signature1')
+    unstage_signature(fake_vcs, 'signature1')
+
+    # test limit
+    signatures = ['generatedsignature' + str(i)
+                  for i in range(fake_user_config['history_limit'])]
 
     for s in signatures:
-        add_signature(fake_vcs, fake_user_config, s)
+        stage_signature(fake_vcs, s)
+        commit_signature(fake_vcs, fake_user_config, s)
 
-    with open(history_path, 'r') as f:
+    with open(committed_path, 'r') as f:
         assert f.read().strip().split() == signatures
+    with open(staged_path, 'r') as f:
+        assert f.read().strip().split() == ['dummy']
+
+
+def test_stage_signature(fake_vcs):
+    staged_path = _get_staged_history_path(fake_vcs)
+
+    # test simple staging
+    stage_signature(fake_vcs, 'signature1')
+    with open(staged_path, 'r') as f:
+        assert f.read().strip().split() == ['signature1']
+
+    # test double staging
+    with pytest.raises(AlreadyStagedError):
+        stage_signature(fake_vcs, 'signature1')
+
+
+def test_unstage_signature(fake_vcs):
+    staged_path = _get_staged_history_path(fake_vcs)
+
+    # test empty case
+    with pytest.raises(NotStagedError):
+        unstage_signature(fake_vcs, 'signature1')
+
+    # test nonempty case
+    with open(staged_path, 'w') as f:
+        f.write('signature1\n')
+    unstage_signature(fake_vcs, 'signature1')
+    with open(staged_path, 'r') as f:
+        assert f.read().strip().split() == []
 
 
 def test_clear_history(fake_vcs):
-    history_path = _get_history_path(fake_vcs)
+    history_path = _get_committed_history_path(fake_vcs)
     assert not os.path.exists(history_path)
     clear_history(fake_vcs)  # when file does not exist
     assert not os.path.exists(history_path)

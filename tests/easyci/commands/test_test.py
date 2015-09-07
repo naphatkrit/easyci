@@ -3,6 +3,7 @@ import os
 import pytest
 
 from easyci.cli import cli
+from easyci.history import stage_signature, commit_signature
 from easyci.user_config import ConfigFormatError, ConfigNotFoundError
 from easyci.vcs.git import GitVcs
 
@@ -28,7 +29,7 @@ def test_config_format_error(runner, fake_hooks):
 
 def test_test_simple_failed(runner):
     with mock.patch('easyci.commands.test.load_user_config') as mocked:
-        mocked.return_value = mocked.return_value = {
+        mocked.return_value = {
             'tests': ['true', 'false'],
             'history_limit': 1,
             'collect_results': [],
@@ -41,7 +42,7 @@ def test_test_simple_failed(runner):
 
 def test_test_simple_passed(runner):
     with mock.patch('easyci.commands.test.load_user_config') as mocked:
-        mocked.return_value = mocked.return_value = {
+        mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': 1,
             'collect_results': [],
@@ -54,7 +55,7 @@ def test_test_simple_passed(runner):
 
 def test_run_twice(runner):
     with mock.patch('easyci.commands.test.load_user_config') as mocked:
-        mocked.return_value = mocked.return_value = {
+        mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': 1,
             'collect_results': [],
@@ -68,7 +69,7 @@ def test_run_twice(runner):
 
 def test_staged_only(runner):
     with mock.patch('easyci.commands.test.load_user_config') as mocked:
-        mocked.return_value = mocked.return_value = {
+        mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': 1,
             'collect_results': [],
@@ -84,7 +85,7 @@ def test_staged_only(runner):
 
 def test_head_only(runner):
     with mock.patch('easyci.commands.test.load_user_config') as mocked:
-        mocked.return_value = mocked.return_value = {
+        mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': 1,
             'collect_results': [],
@@ -100,7 +101,7 @@ def test_head_only(runner):
 
 def test_run_twice_new_file(runner):
     with mock.patch('easyci.commands.test.load_user_config') as mocked:
-        mocked.return_value = mocked.return_value = {
+        mocked.return_value = {
             'tests': ['true', 'true'],
             'history_limit': 1,
             'collect_results': [],
@@ -150,3 +151,29 @@ def test_collect_results(runner):
         assert not os.path.exists(f)
     for f in result_files:
         assert os.path.exists(f)
+
+
+def test_already_staged_or_committed(runner):
+    config = {
+        'tests': ['true', 'true'],
+        'history_limit': 1,
+        'collect_results': [],
+    }
+    git = GitVcs()
+    signature = git.get_signature()
+
+    # test staged
+    stage_signature(git, signature)
+    with mock.patch('easyci.commands.test.load_user_config') as mocked:
+        mocked.return_value = config
+        result = runner.invoke(cli, ['test'])
+    assert result.exit_code == 1
+    assert 'In Progress' in result.output
+
+    # test committed
+    commit_signature(git, config, signature)
+    with mock.patch('easyci.commands.test.load_user_config') as mocked:
+        mocked.return_value = config
+        result = runner.invoke(cli, ['test'])
+    assert result.exit_code == 0
+    assert 'OK' in result.output
