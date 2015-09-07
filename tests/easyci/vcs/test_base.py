@@ -10,6 +10,9 @@ class DummyVcs(Vcs):
     def get_working_directory(self):
         return os.getcwd()
 
+    def private_dir(self):
+        return os.path.join(self.path, '.dummy/eci')
+
     def ignore_patterns_file(self):
         return '.dummyignore'
 
