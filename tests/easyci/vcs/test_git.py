@@ -117,7 +117,16 @@ def test_get_ignored_files(git, repo_path):
         with open('.gitignore', 'w') as f:
             f.write('a\n')
         assert not os.system('mkdir a && touch a/1.txt a/2.txt')
-        assert set(git.get_ignored_files()) == set([os.path.join(repo_path, 'a/1.txt'), os.path.join(repo_path, 'a/2.txt')])
+        assert set(git.get_ignored_files()) == set(
+            [os.path.join(repo_path, 'a/1.txt'), os.path.join(repo_path, 'a/2.txt')])
+
+
+def test_path_is_ignored(git, repo_path):
+    with contextmanagers.chdir(repo_path):
+        with open('.gitignore', 'w') as f:
+            f.write('a\n')
+        assert git.path_is_ignored('a')
+        assert not git.path_is_ignored('b')
 
 
 def test_private_dir(git, repo_path):

@@ -26,11 +26,8 @@ class VcsEventHandler(FileSystemEventHandler):
             paths.append(os.path.realpath(
                 unicode_paths.decode(event.src_path)))
         paths = [p for p in paths
-                 if not p.startswith(os.path.realpath(self.vcs.repository_dir()))]
-        ignored_paths = set(
-            os.path.realpath(os.path.join(self.vcs.path, p))
-            for p in self.vcs.get_ignored_files()
-        )
+                 if not p.startswith(os.path.realpath(self.vcs.repository_dir()))
+                 and not self.vcs.path_is_ignored(p)]
 
-        if any(p not in ignored_paths for p in paths):
+        if len(paths) > 0:
             super(VcsEventHandler, self).dispatch(event)

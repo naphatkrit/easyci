@@ -21,8 +21,7 @@ def fake_vcs(repo_path):
     vcs = mock.Mock(spec=Vcs)
     vcs.path = repo_path
     vcs.repository_dir.return_value = os.path.join(repo_path, '.git')
-    vcs.get_ignored_files.return_value = [os.path.join(repo_path, 'a/1.txt'),
-                                          os.path.join(repo_path, 'a/2.txt')]
+    vcs.path_is_ignored = lambda path: 'a/1.txt' in path or 'a/2.txt' in path
     return vcs
 
 

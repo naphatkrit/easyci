@@ -151,3 +151,20 @@ class GitVcs(Vcs):
             str - file name
         """
         return '.gitignore'
+
+    def path_is_ignored(self, path):
+        """Given a path, check if the path would be ignored.
+
+        Returns:
+            boolean
+        """
+        try:
+            self.run('check-ignore', '--quiet', path)
+        except CommandError as e:
+            if e.retcode == 1:
+                # path is ignored
+                return False
+            else:
+                # fatal error
+                raise e
+        return True

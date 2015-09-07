@@ -154,6 +154,14 @@ class Vcs(object):
         """
         raise NotImplementedError  # pragma: no cover
 
+    def path_is_ignored(self, path):
+        """Given a path, check if the path would be ignored.
+
+        Returns:
+            boolean
+        """
+        raise NotImplementedError  # pragma: no cover
+
     def get_ignored_files(self):
         """Returns the list of files being ignored in this repository.
 
