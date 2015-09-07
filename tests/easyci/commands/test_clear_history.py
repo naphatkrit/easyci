@@ -17,7 +17,8 @@ def fake_vcs(runner):
 
 @pytest.fixture(scope='function', autouse=True)
 def init(runner):
-    runner.invoke(cli, ['init'])
+    result = runner.invoke(cli, ['init'])
+    assert result.exit_code == 0
 
 
 def test_clear_history(runner, fake_vcs):

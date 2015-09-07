@@ -10,7 +10,8 @@ from easyci.vcs.git import GitVcs
 
 @pytest.fixture(scope='function', autouse=True)
 def init(runner):
-    runner.invoke(cli, ['init'])
+    result = runner.invoke(cli, ['init'])
+    assert result.exit_code == 0
 
 
 def test_config_not_found(runner, fake_hooks):
