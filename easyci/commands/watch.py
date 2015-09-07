@@ -8,7 +8,7 @@ from easyci.file_system_events.tests_event_handler import TestsEventHandler
 @click.command()
 @click.pass_context
 def watch(ctx):
-    """Watch the directory for changes and automatically run tests.
+    """Watch the directory for changes. Automatically run tests.
     """
     vcs = ctx.obj['vcs']
 
