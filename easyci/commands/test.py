@@ -1,7 +1,7 @@
 import click
 import subprocess32 as subprocess
 
-from easyci import locking
+from easyci import exit_codes, locking
 from easyci.history import (
     commit_signature, get_committed_signatures, get_staged_signatures,
     stage_signature, unstage_signature,
@@ -65,12 +65,12 @@ def test(ctx, staged_only, head_only):
                     click.echo('Done')
                 except ResultsNotFoundError:
                     click.echo('No results to sync.')
-                ctx.exit(0)
+                ctx.exit(exit_codes.SUCCESS)
             if in_staged:
                 click.echo('')
                 click.echo(click.style('In Progress', bg='yellow', fg='black') +
                            ' Tests already running.')
-                ctx.abort()
+                ctx.exit(exit_codes.ALREADY_RUNNING)
         click.echo('Done.')
         with contextmanagers.chdir(copy.path):
             all_passed = True
@@ -100,6 +100,7 @@ def test(ctx, staged_only, head_only):
             # save signature
             if not all_passed:
                 unstage_signature(git, new_signature)
-                ctx.exit(1)
+                ctx.exit(exit_codes.FAILURE)
             else:
                 commit_signature(git, config, new_signature)
+                ctx.exit(exit_codes.SUCCESS)

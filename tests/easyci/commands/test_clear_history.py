@@ -2,6 +2,7 @@ import mock
 import os
 import pytest
 
+from easyci import exit_codes
 from easyci.vcs.base import Vcs
 from easyci.cli import cli
 
@@ -18,7 +19,7 @@ def fake_vcs(runner):
 @pytest.fixture(scope='function', autouse=True)
 def init(runner):
     result = runner.invoke(cli, ['init'])
-    assert result.exit_code == 0
+    assert result.exit_code == exit_codes.SUCCESS
 
 
 def test_clear_history(runner, fake_vcs):
@@ -26,4 +27,4 @@ def test_clear_history(runner, fake_vcs):
         with mock.patch('easyci.commands.clear_history.clear_history_internal') as mocked:
             result = runner.invoke(cli, ['clear-history'])
     mocked.assert_called_once_with(fake_vcs)
-    assert result.exit_code == 0
+    assert result.exit_code == exit_codes.SUCCESS

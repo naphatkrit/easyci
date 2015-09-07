@@ -2,6 +2,7 @@ import mock
 import os
 import pytest
 
+from easyci import exit_codes
 from easyci.cli import cli
 from easyci.history import stage_signature
 from easyci.results import _get_results_directory
@@ -20,12 +21,13 @@ def fake_vcs(runner):
 @pytest.fixture(scope='function', autouse=True)
 def init(runner):
     result = runner.invoke(cli, ['init'])
-    assert result.exit_code == 0
+    assert result.exit_code == exit_codes.SUCCESS
 
 
-def test_gc_no_results(runner):
+def test_gc_no_results(runner, fake_vcs):
     with mock.patch('easyci.cli.GitVcs', new=lambda: fake_vcs):
-        runner.invoke(cli, ['gc'])
+        result = runner.invoke(cli, ['gc'])
+    assert result.exit_code == exit_codes.SUCCESS
 
 
 def test_gc_with_results(runner, fake_vcs):
@@ -34,6 +36,7 @@ def test_gc_with_results(runner, fake_vcs):
     os.makedirs(_get_results_directory(fake_vcs, 'signature1'))
     os.makedirs(_get_results_directory(fake_vcs, 'nonexistentsignature1'))
     with mock.patch('easyci.cli.GitVcs', new=lambda: fake_vcs):
-        runner.invoke(cli, ['gc'])
+        result = runner.invoke(cli, ['gc'])
+    assert result.exit_code == exit_codes.SUCCESS
     assert os.path.exists(_get_results_directory(fake_vcs, 'signature1'))
     assert not os.path.exists(_get_results_directory(fake_vcs, 'nonexistentsignature1'))

@@ -6,10 +6,17 @@ import watchdog.utils
 
 from multiprocessing import dummy as multiprocessing
 
+from easyci import exit_codes
 from easyci.file_system_events.vcs_event_handler import VcsEventHandler
 
 
 class TestsEventHandler(VcsEventHandler):
+
+    _exit_messages = {
+        exit_codes.SUCCESS: click.style('Passed', bg='green', fg='black'),
+        exit_codes.FAILURE: click.style('Failed', bg='red', fg='black'),
+        exit_codes.ALREADY_RUNNING: click.style('Already Running', bg='yellow', fg='black'),
+    }
 
     def __init__(self, vcs):
         super(TestsEventHandler, self).__init__(vcs)
@@ -38,11 +45,7 @@ class TestsEventHandler(VcsEventHandler):
         str_event = self._get_event_string(event)
 
         def callback(code):
-            if code == 0:
-                status = click.style('Passed', bg='green', fg='black')
-            else:
-                status = click.style('Failed', bg='red', fg='black')
-            click.echo(status + ' ' + str_event)
+            click.echo(self._exit_messages[code] + ' ' + str_event)
         click.echo(click.style('Detected', bg='yellow',
                                fg='black') + ' ' + str_event)
         devnull = open(os.devnull, 'w')
