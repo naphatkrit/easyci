@@ -28,6 +28,14 @@ EasyCI also makes sure not to run tests redundantly. If you ran tests before usi
 
 This means that if you run tests regularly as part of your workflow, there is effectively no efficiency cost in using EasyCI, yet you can rest easy knowing that if you forgot to run tests, you will not be allowed to commit/push.
 
+EasyCI is designed to shift the burden of test running away from you. To that end, it is possible to have EasyCI monitor your project for changes and automatically run tests, so that by the time you want to commit your changes, your tests would have already been run. Do this in a separate shell session:
+
+.. code-block:: bash
+
+    $ # from anywhere in your project
+    $ eci watch
+    Watching directory `/path/to/project`. Use ctrl-c to stop.
+
 Installation/Setup
 ------------------
 First, install EasyCI using :code:`pip`.
@@ -94,6 +102,16 @@ Initialize the project for use with EasyCI. This installs the necessary git hook
 eci test
 ++++++++
 Run tests. If a passing test run is found in the tests run history, then this does not run any tests.
+
+
+eci watch
++++++++++
+Watch the current repository for changes and automatically run tests.
+
+
+eci gc
+++++++
+Runs housekeeping tasks to free up space. For now, this only removes saved but unused (unreachable) test results.
 
 
 eci clear-history
