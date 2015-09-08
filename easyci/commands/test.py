@@ -47,7 +47,7 @@ def test(ctx, staged_only, head_only):
             click.echo("No config file")
             config = _default_config
 
-        click.echo('Checking if tests were already ran...', nl=False)
+        click.echo('Checking if tests were already run...', nl=False)
         new_signature = copy.get_signature()
 
         with locking.lock(git, locking.Lock.tests_history):
