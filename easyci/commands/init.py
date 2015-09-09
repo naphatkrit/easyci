@@ -6,11 +6,13 @@ import easyci
 
 from easyci import locking
 from easyci.hooks import hooks_manager
+from easyci.utils import decorators
 from easyci.version import set_installed_version
 
 
 @click.command()
 @click.pass_context
+@decorators.print_markers
 def init(ctx):
     """Initialize the project for use with EasyCI. This installs the necessary
     git hooks (pre-commit + pre-push) and add a config file if one does not

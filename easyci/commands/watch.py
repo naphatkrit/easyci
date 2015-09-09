@@ -3,10 +3,12 @@ import click
 from watchdog.observers import Observer
 
 from easyci.file_system_events.tests_event_handler import TestsEventHandler
+from easyci.utils import decorators
 
 
 @click.command()
 @click.pass_context
+@decorators.print_markers
 def watch(ctx):
     """Watch the directory for changes. Automatically run tests.
     """

@@ -7,7 +7,7 @@ from easyci.history import (
     stage_signature, unstage_signature,
 )
 from easyci.results import save_results, sync_results, ResultsNotFoundError
-from easyci.utils import contextmanagers
+from easyci.utils import contextmanagers, decorators
 from easyci.user_config import (
     load_user_config, ConfigFormatError, ConfigNotFoundError,
     _default_config
@@ -18,6 +18,7 @@ from easyci.user_config import (
 @click.option('--staged-only', '-s', is_flag=True, default=False, help='Test against staged version of the repo. Remove all unstaged and ignored files before running.')
 @click.option('--head-only', '-h', is_flag=True, default=False, help='Test against the current HEAD. Resets to HEAD and remove all ignored files before running.')
 @click.pass_context
+@decorators.print_markers
 def test(ctx, staged_only, head_only):
     """Run tests. If a passing test run is found in the tests run history,
     then this does not run any tests.

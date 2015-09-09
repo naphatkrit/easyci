@@ -1,10 +1,12 @@
 import click
 
 from easyci.history import clear_history as clear_history_internal
+from easyci.utils import decorators
 
 
 @click.command('clear-history')
 @click.pass_context
+@decorators.print_markers
 def clear_history(ctx):
     """Clear tests run history. History is normally used to keep track of
     whether a test has been run for a specific state of the project, to

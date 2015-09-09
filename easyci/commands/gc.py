@@ -3,10 +3,12 @@ import click
 from easyci import locking
 from easyci.history import get_committed_signatures, get_staged_signatures
 from easyci.results import get_signatures_with_results, remove_results
+from easyci.utils import decorators
 
 
 @click.command('gc')
 @click.pass_context
+@decorators.print_markers
 def gc(ctx):
     """Runs housekeeping tasks to free up space.
 
