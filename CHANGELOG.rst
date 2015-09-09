@@ -1,5 +1,10 @@
 Change Logs
 -----------
+2.0.1
+=====
+- print markers around command output to separate EasyCI outputs from other outputs
+- fixed a typo in one of the outputs
+
 2.0.0
 =====
 - automatically run tests on any changes with :code:`eci watch`.
